@@ -9,9 +9,13 @@ import { OTP_EXPIRY_TIME } from '../constants/index';
 let otpTimer;
 let remainingTimeTimer;
 
+const initialUserData = {
+  userid: '',
+  time: getNowDateTime(),
+};
+
 const Form = ({ otpData }) => {
-  const [id, setId] = useState('');
-  const [time, setTime] = useState(getNowDateTime());
+  const [userData, setUserData] = useState(initialUserData);
   const [otp, setOtp] = useState('');
   const [generateBtnStatus, setGenerateBtnStatus] = useState(false);
   const [timeRemaining, setRemainingTime] = useState(OTP_EXPIRY_TIME / 1000);
@@ -21,17 +25,17 @@ const Form = ({ otpData }) => {
     if (startTimer) {
       remainingTimeTimer = setInterval(() => {
         setRemainingTime(timeRemaining - 1);
-        setTime(getNowDateTime());
+        setUserData({ ...userData, time: getNowDateTime() });
       }, 1000);
     }
 
     return () => clearInterval(remainingTimeTimer);
-  }, [timeRemaining, startTimer]);
+  }, [userData, timeRemaining, startTimer]);
 
   const handleGenerateOTP = () => {
     setOtp(generateOTP(...otpData));
-    if(!id) {
-      setId(generateRandomUserId(1000));
+    if (!userData.userid) {
+      setUserData({ ...userData, userid: generateRandomUserId(1000) });
     }
     setTimerStart(true);
     otpTimer = setInterval(() => {
@@ -44,22 +48,22 @@ const Form = ({ otpData }) => {
   const handleResetOTPGeneration = () => {
     clearInterval(otpTimer);
     clearInterval(remainingTimeTimer);
-    setId('');
+
     setOtp('');
     setGenerateBtnStatus(false);
     setTimerStart(false);
-    setTime(getNowDateTime());
+    console.log(userData)
+    setUserData({ ...userData, userid: '', time: getNowDateTime() });
     setRemainingTime(OTP_EXPIRY_TIME / 1000);
   };
 
-  const handleIdChange = (event) => {
-    event.preventDefault();
-    setId(event.target.value);
-  };
+  const handleUserDataChange = (event) => {
+    const { name, value } = event.target;
 
-  const handleTimeChange = (event) => {
-    event.preventDefault();
-    setTime(event.target.value);
+    setUserData({
+      ...userData,
+      [name]: value,
+    });
   };
 
   return (
@@ -68,20 +72,20 @@ const Form = ({ otpData }) => {
         <label htmlFor="id">User id</label>
         <input
           type="number"
-          value={id}
-          name="id"
+          value={userData.userid}
+          name="userid"
           required
-          onChange={(event) => handleIdChange(event)}
+          onChange={(event) => handleUserDataChange(event)}
         />
       </div>
       <div className="datetime-container">
         <label htmlFor="datetime">Time</label>
         <input
-          value={time}
+          value={userData.time}
           type="datetime-local"
           name="datetime"
           required
-          onChange={(event) => handleTimeChange(event)}
+          onChange={(event) => handleUserDataChange(event)}
           disabled
         />
       </div>
@@ -103,10 +107,13 @@ const Form = ({ otpData }) => {
       </button>
       {otp?.length > 0 && (
         <p>
-          OTP: {otp} was generated for user id {id} at {time}
+          OTP: {otp} was generated for user id {userData.userid} at{' '}
+          {userData.time}
         </p>
       )}
-      {id && <p>Password will expire in: {timeRemaining} seconds!!!</p>}
+      {userData.userid && (
+        <p>Password will expire in: {timeRemaining} seconds!!!</p>
+      )}
     </form>
   );
 };
