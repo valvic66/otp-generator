@@ -1,4 +1,8 @@
 import React, {useState} from 'react';
+import { generateOTP } from '../utils/index';
+
+const otpData = [6, '12345abcde'];
+console.log(generateOTP(...otpData));
 
 const Form = ({}) => {
   const [id, setId] = useState(null);
@@ -7,7 +11,10 @@ const Form = ({}) => {
   const handleClick = event => {
     event.preventDefault();
 
-    console.log("clicked", id, time, typeof time, time.length);
+    if (id && time?.length > 0) {
+      console.log("clicked", id, time, typeof id, typeof time, time.length);
+    }
+
   }
 
   const handleIdChange = event => {
