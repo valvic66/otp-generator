@@ -1,37 +1,66 @@
-import React, {useState} from 'react';
-import { generateOTP } from '../utils/index';
+import React, { useState, useEffect } from 'react';
+import {
+  generateOTP,
+  generateRandomUserId,
+  getNowDateTime,
+} from '../utils/index';
+import { OTP_EXPIRY_TIME } from '../constants/index';
 
-const otpData = [6, '12345abcde'];
+let otpTimer;
+let remainingTimeTimer;
 
-const Form = ({}) => {
-  const [id, setId] = useState(null);
-  const [time, setTime] = useState(null);
-  const [otp, setOtp] = useState(null);
+const Form = ({ otpData }) => {
+  const [id, setId] = useState('');
+  const [time, setTime] = useState(getNowDateTime());
+  const [otp, setOtp] = useState('');
+  const [generateBtnStatus, setGenerateBtnStatus] = useState(false);
+  const [timeRemaining, setRemainingTime] = useState(OTP_EXPIRY_TIME / 1000);
+  const [startTimer, setTimerStart] = useState(false);
 
-  const handleClick = event => {
-    event.preventDefault();
-
-    if (id && time?.length > 0) {
-      console.log("clicked", id, time, typeof id, typeof time, time.length);
+  useEffect(() => {
+    if (startTimer) {
+      remainingTimeTimer = setInterval(() => {
+        setRemainingTime(timeRemaining - 1);
+        setTime(getNowDateTime());
+      }, 1000);
     }
 
-    const otp = generateOTP(...otpData);
-    setOtp(otp);
-  }
+    return () => clearInterval(remainingTimeTimer);
+  }, [timeRemaining, startTimer]);
 
-  const handleIdChange = event => {
-    const id = event.target.value;
-    
-    event.preventDefault();
-    setId(id);
-  }
+  const handleGenerateOTP = () => {
+    setOtp(generateOTP(...otpData));
+    if(!id) {
+      setId(generateRandomUserId(1000));
+    }
+    setTimerStart(true);
+    otpTimer = setInterval(() => {
+      setOtp(generateOTP(...otpData));
+      setRemainingTime(OTP_EXPIRY_TIME / 1000);
+    }, OTP_EXPIRY_TIME);
+    setGenerateBtnStatus(true);
+  };
 
-  const handleTimeChange = event => {
-    const time = event.target.value;
-    
+  const handleResetOTPGeneration = () => {
+    clearInterval(otpTimer);
+    clearInterval(remainingTimeTimer);
+    setId('');
+    setOtp('');
+    setGenerateBtnStatus(false);
+    setTimerStart(false);
+    setTime(getNowDateTime());
+    setRemainingTime(OTP_EXPIRY_TIME / 1000);
+  };
+
+  const handleIdChange = (event) => {
     event.preventDefault();
-    setTime(time);
-  }
+    setId(event.target.value);
+  };
+
+  const handleTimeChange = (event) => {
+    event.preventDefault();
+    setTime(event.target.value);
+  };
 
   return (
     <form className="form">
@@ -39,6 +68,7 @@ const Form = ({}) => {
         <label htmlFor="id">User id</label>
         <input
           type="number"
+          value={id}
           name="id"
           required
           onChange={(event) => handleIdChange(event)}
@@ -47,20 +77,36 @@ const Form = ({}) => {
       <div className="datetime-container">
         <label htmlFor="datetime">Time</label>
         <input
+          value={time}
           type="datetime-local"
           name="datetime"
           required
           onChange={(event) => handleTimeChange(event)}
+          disabled
         />
       </div>
       <button
-        type="submit"
+        type="button"
         className="button"
-        onClick={(event) => handleClick(event)}
-      >Generate OTP</button>
-      {id && <p>User id: {id}</p>}
-      {time?.length > 0 && <p>Date.Time: {time}</p>}
-      {otp?.length > 0 && <p>otp: {otp}</p>}
+        onClick={(event) => handleGenerateOTP(event)}
+        disabled={generateBtnStatus}
+      >
+        Generate OTP
+      </button>
+      <button
+        type="button"
+        className="button"
+        onClick={() => handleResetOTPGeneration()}
+        disabled={!generateBtnStatus}
+      >
+        Stop OTP generation
+      </button>
+      {otp?.length > 0 && (
+        <p>
+          OTP: {otp} was generated for user id {id} at {time}
+        </p>
+      )}
+      {id && <p>Password will expire in: {timeRemaining} seconds!!!</p>}
     </form>
   );
 };

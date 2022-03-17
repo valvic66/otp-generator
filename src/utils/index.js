@@ -28,3 +28,20 @@ export const generateOTP = (len, acceptedChars) => {
 
   return otp;
 }
+
+export const generateRandomUserId = maxIdLimit => {
+  return Math.floor(Math.random() * maxIdLimit);
+}
+
+export const getNowDateTime = () => {
+  const now = new Date();
+  const month = (now.getMonth() + 1).toString();
+  const minutes = (now.getMinutes()).toString();
+  const formatedMonth = month.length < 2 ? month.padStart(2, '0') : month;
+  const formatedMinutes = minutes.length < 2 ? minutes.padStart(2, '0') : minutes;
+
+  const date = `${now.getFullYear()}-${formatedMonth}-${now.getDate()}`;
+  const time = `${now.getHours()}:${formatedMinutes}`;
+
+  return `${date}T${time}`;
+}
