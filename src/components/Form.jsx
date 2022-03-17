@@ -2,11 +2,11 @@ import React, {useState} from 'react';
 import { generateOTP } from '../utils/index';
 
 const otpData = [6, '12345abcde'];
-console.log(generateOTP(...otpData));
 
 const Form = ({}) => {
   const [id, setId] = useState(null);
   const [time, setTime] = useState(null);
+  const [otp, setOtp] = useState(null);
 
   const handleClick = event => {
     event.preventDefault();
@@ -15,6 +15,8 @@ const Form = ({}) => {
       console.log("clicked", id, time, typeof id, typeof time, time.length);
     }
 
+    const otp = generateOTP(...otpData);
+    setOtp(otp);
   }
 
   const handleIdChange = event => {
@@ -56,6 +58,9 @@ const Form = ({}) => {
         className="button"
         onClick={(event) => handleClick(event)}
       >Generate OTP</button>
+      {id && <p>User id: {id}</p>}
+      {time?.length > 0 && <p>Date.Time: {time}</p>}
+      {otp?.length > 0 && <p>otp: {otp}</p>}
     </form>
   );
 };
