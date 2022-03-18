@@ -5,6 +5,7 @@ import {
   getCurentTime,
 } from '../utils/index';
 import { OTP_EXPIRY_TIME, USER_ID_RANDOM_MAX_VALUE } from '../constants/index';
+import './Form.css';
 
 const initialUserData = {
   userid: '',
@@ -68,7 +69,7 @@ const Form = ({ otpLength, acceptedChars }) => {
   };
 
   return (
-    <form className="form">
+    <form className="form-container">
       <div className="userid-container">
         <label htmlFor="id">User id</label>
         <input
@@ -77,6 +78,7 @@ const Form = ({ otpLength, acceptedChars }) => {
           name="userid"
           required
           onChange={(event) => handleUserDataChange(event)}
+          placeholder="auto or insert id"
         />
       </div>
       <div className="datetime-container">
@@ -90,31 +92,35 @@ const Form = ({ otpLength, acceptedChars }) => {
           disabled
         />
       </div>
-      <button
-        type="button"
-        className="button"
-        onClick={(event) => handleGenerateOTP(event)}
-        disabled={!isGenerateBtnEnabled}
-      >
-        Generate OTP
-      </button>
-      <button
-        type="button"
-        className="button"
-        onClick={() => handleResetOTPGeneration()}
-        disabled={isGenerateBtnEnabled}
-      >
-        Stop OTP generation
-      </button>
-      {otp?.length > 0 && (
-        <p>
-          OTP: {otp} was generated for user id {userData.userid} at{' '}
-          {userData.time}
-        </p>
-      )}
-      {userData.userid && (
-        <p>Password will expire in: {timeRemaining} seconds!!!</p>
-      )}
+      <div className="buttons-container">
+        <div className="generateotp-button-container">
+          <button
+            className="button"
+            type="button"
+            onClick={(event) => handleGenerateOTP(event)}
+            disabled={!isGenerateBtnEnabled}
+          >
+            Generate OTP
+          </button>
+        </div>
+        <div className="resetotp-button-container">
+          <button
+            type="button"
+            className="button"
+            onClick={() => handleResetOTPGeneration()}
+            disabled={isGenerateBtnEnabled}
+          >
+            Reset OTP
+          </button>
+        </div>
+      </div>
+      <div className="result-container">
+        {otp?.length > 0 && (
+          <p>
+            Generated otp <span style={{fontWeight: 'bold'}}>{otp}</span> expires in {timeRemaining} seconds!
+          </p>
+        )}
+      </div>
     </form>
   );
 };

@@ -1,0 +1,45 @@
+.form-container {
+  box-shadow: 0 2px 16px rgb(0, 0, 0, 0.6);
+  padding: 10px;
+  min-width: 320px;
+  background-color: #fff;
+}
+
+input {
+  outline: none;
+  border: none;
+  background: lightgrey;
+}
+
+input[type=number] {
+  background-color: #fff;
+  border-bottom: 1px solid;
+  margin-left: 10px;
+  height: 20px;
+  width: 120px;
+}
+
+input[type='datetime-local'] {
+  background-color: #fff;
+  margin: 5px 20px;
+  font-weight: bold;
+}
+
+.buttons-container {
+  display: flex;
+  justify-content: center;
+}
+
+.button {
+  background: #000;
+  color: white;
+  margin: 10px 20px;
+  padding: 5px 10px;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.button:disabled {
+  color: grey;
+}
