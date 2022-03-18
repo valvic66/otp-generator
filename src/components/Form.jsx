@@ -77,8 +77,9 @@ const Form = ({ otpLength, acceptedChars }) => {
           value={userData.userid}
           name="userid"
           required
-          onChange={(event) => handleUserDataChange(event)}
+          onChange={(event) => handleUserDataChange(event)} 
           placeholder="auto or insert id"
+          data-testid="USER_ID"
         />
       </div>
       <div className="datetime-container">
@@ -117,7 +118,8 @@ const Form = ({ otpLength, acceptedChars }) => {
       <div className="result-container">
         {otp?.length > 0 && (
           <p>
-            Generated otp <span style={{fontWeight: 'bold'}}>{otp}</span> expires in {timeRemaining} seconds!
+            Generated otp <span style={{ fontWeight: 'bold' }}>{otp}</span>{' '}
+            expires in {timeRemaining} seconds!
           </p>
         )}
       </div>
