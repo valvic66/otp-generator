@@ -1,15 +1,16 @@
 import './App.css';
 import Form from './components/Form';
 
-const otpData = [
-  6,
-  '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
-];
+  const OTP_LENGTH = 6;
+  const ACCEPTED_CHARS = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
 function App() {
   return (
     <div className="App">
-      <Form otpData={otpData} />
+      <Form
+        otpLength={OTP_LENGTH}
+        acceptedChars={ACCEPTED_CHARS}
+      />
     </div>
   );
 }

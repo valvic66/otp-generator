@@ -1,59 +1,60 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   generateOTP,
   generateRandomUserId,
-  getNowDateTime,
+  getCurentTime,
 } from '../utils/index';
-import { OTP_EXPIRY_TIME } from '../constants/index';
-
-let otpTimer;
-let remainingTimeTimer;
+import { OTP_EXPIRY_TIME, USER_ID_RANDOM_MAX_VALUE } from '../constants/index';
 
 const initialUserData = {
   userid: '',
-  time: getNowDateTime(),
+  time: getCurentTime(),
 };
 
-const Form = ({ otpData }) => {
+const Form = ({ otpLength, acceptedChars }) => {
   const [userData, setUserData] = useState(initialUserData);
   const [otp, setOtp] = useState('');
-  const [generateBtnStatus, setGenerateBtnStatus] = useState(false);
+  const [isGenerateBtnEnabled, setGenerateBtnStatus] = useState(true);
   const [timeRemaining, setRemainingTime] = useState(OTP_EXPIRY_TIME / 1000);
-  const [startTimer, setTimerStart] = useState(false);
+  const [isTimerStarted, setTimerStart] = useState(false);
+  let otpInterval = useRef(null);
+  let remainingTimeInterval = useRef(null);
 
   useEffect(() => {
-    if (startTimer) {
-      remainingTimeTimer = setInterval(() => {
+    if (isTimerStarted) {
+      remainingTimeInterval.current = setInterval(() => {
         setRemainingTime(timeRemaining - 1);
-        setUserData({ ...userData, time: getNowDateTime() });
+        setUserData({ ...userData, time: getCurentTime() });
       }, 1000);
     }
 
-    return () => clearInterval(remainingTimeTimer);
-  }, [userData, timeRemaining, startTimer]);
+    return () => clearInterval(remainingTimeInterval.current);
+  }, [userData, timeRemaining, isTimerStarted]);
 
   const handleGenerateOTP = () => {
-    setOtp(generateOTP(...otpData));
+    setOtp(generateOTP(otpLength, acceptedChars));
     if (!userData.userid) {
-      setUserData({ ...userData, userid: generateRandomUserId(1000) });
+      setUserData({
+        ...userData,
+        userid: generateRandomUserId(USER_ID_RANDOM_MAX_VALUE),
+      });
     }
     setTimerStart(true);
-    otpTimer = setInterval(() => {
-      setOtp(generateOTP(...otpData));
+    otpInterval.current = setInterval(() => {
+      setOtp(generateOTP(otpLength, acceptedChars));
       setRemainingTime(OTP_EXPIRY_TIME / 1000);
     }, OTP_EXPIRY_TIME);
-    setGenerateBtnStatus(true);
+    setGenerateBtnStatus(false);
   };
 
   const handleResetOTPGeneration = () => {
-    clearInterval(otpTimer);
-    clearInterval(remainingTimeTimer);
+    clearInterval(otpInterval.current);
+    clearInterval(remainingTimeInterval.current);
 
     setOtp('');
-    setGenerateBtnStatus(false);
+    setGenerateBtnStatus(true);
     setTimerStart(false);
-    console.log(userData)
-    setUserData({ ...userData, userid: '', time: getNowDateTime() });
+    setUserData({ ...userData, userid: '', time: getCurentTime() });
     setRemainingTime(OTP_EXPIRY_TIME / 1000);
   };
 
@@ -93,7 +94,7 @@ const Form = ({ otpData }) => {
         type="button"
         className="button"
         onClick={(event) => handleGenerateOTP(event)}
-        disabled={generateBtnStatus}
+        disabled={!isGenerateBtnEnabled}
       >
         Generate OTP
       </button>
@@ -101,7 +102,7 @@ const Form = ({ otpData }) => {
         type="button"
         className="button"
         onClick={() => handleResetOTPGeneration()}
-        disabled={!generateBtnStatus}
+        disabled={isGenerateBtnEnabled}
       >
         Stop OTP generation
       </button>

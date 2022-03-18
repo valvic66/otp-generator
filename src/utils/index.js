@@ -33,15 +33,18 @@ export const generateRandomUserId = maxIdLimit => {
   return Math.floor(Math.random() * maxIdLimit);
 }
 
-export const getNowDateTime = () => {
+export const getCurentTime = () => {
   const now = new Date();
   const month = (now.getMonth() + 1).toString();
   const minutes = (now.getMinutes()).toString();
+  const hours = (now.getHours()).toString();
+
   const formatedMonth = month.length < 2 ? month.padStart(2, '0') : month;
   const formatedMinutes = minutes.length < 2 ? minutes.padStart(2, '0') : minutes;
+  const formatedHours = hours.length < 2 ? hours.padStart(2, '0') : hours;
 
   const date = `${now.getFullYear()}-${formatedMonth}-${now.getDate()}`;
-  const time = `${now.getHours()}:${formatedMinutes}`;
+  const time = `${formatedHours}:${formatedMinutes}`;
 
   return `${date}T${time}`;
 }
